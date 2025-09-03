@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CopilotKitGUI - Visual Application Builder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #10b981;
+            --dark: #1f2937;
+            --light: #f9fafb;
+            --gray: #9ca3af;
+            --success: #059669;
+            --warning: #f59e0b;
+            --error: #ef4444;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 280px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .logo-icon {
+            font-size: 28px;
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .logo-text {
+            font-size: 22px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .sidebar-section {
+            margin-bottom: 25px;
+        }
+        
+        .sidebar-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray);
+            margin-bottom: 15px;
+        }
+        
+        .component-list {
+            list-style: none;
+        }
+        
+        .component-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            cursor: grab;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .component-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .component-icon {
+            margin-right: 10px;
+            color: var(--primary);
+            width: 20px;
+        }
+        
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 20px 30px;
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .project-name {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .project-name i {
+            color: var(--primary);
+            margin-right: 10px;
+        }
+        
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        /* Designer Area */
+        .designer-container {
+            flex: 1;
+            display: flex;
+            padding: 20px;
+            gap: 20px;
+        }
+        
+        .canvas-container {
+            flex: 1;
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 12px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            overflow: auto;
+        }
+        
+        .canvas-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+        
+        .design-canvas {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 12px;
+            min-height: 400px;
+            padding: 25px;
+            margin: 0 auto;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* AI Assistant Panel */
+        .ai-panel {
+            width: 350px;
+            background: rgba(30, 41, 59, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .ai-icon {
+            font-size: 24px;
+            color: var(--secondary);
+            margin-right: 10px;
+        }
+        
+        .ai-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .ai-conversation {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 10px;
+        }
+        
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            max-width: 90%;
+        }
+        
+        .ai-message {
+            background: rgba(16, 185, 129, 0.2);
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .user-message {
+            background: rgba(99, 102, 241, 0.2);
+            border-left: 4px solid var(--primary);
+            margin-left: auto;
+        }
+        
+        .ai-input {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .ai-input input {
+            flex: 1;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+        }
+        
+        .ai-input button {
+            padding: 12px;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        
+        /* Component Styles */
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .form-title {
+            text-align: center;
+            margin-bottom: 25px;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(15, 23, 42, 0.5);
+            color: white;
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .designer-container {
+                flex-direction: column;
+            }
+            
+            .ai-panel {
+                width: 100%;
+                height: 300px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .component-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .component-item {
+                margin-bottom: 0;
+            }
+        }
+        
+        /* Animation for components */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        /* Code Preview Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background: #1e293b;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow: auto;
+            padding: 25px;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .code-block {
+            background: #0f172a;
+            border-radius: 8px;
+            padding: 20px;
+            overflow: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.5;
+        }
+        
+        .export-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar with components -->
+        <div class="sidebar">
+            <div class="logo">
+                <i class="fas fa-robot logo-icon"></i>
+                <div class="logo-text">CopilotKitGUI</div>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">UI Components</h3>
+                <ul class="component-list">
+                    <li class="component-item" draggable="true" data-type="input">
+                        <i class="fas fa-input-numeric component-icon"></i>
+                        <span>Input Field</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="toggle">
+                        <i class="fas fa-toggle-on component-icon"></i>
+                        <span>Toggle Switch</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="button">
+                        <i class="fas fa-button component-icon"></i>
+                        <span>Button</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="dropdown">
+                        <i class="fas fa-list component-icon"></i>
+                        <span>Dropdown</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="slider">
+                        <i class="fas fa-sliders-h component-icon"></i>
+                        <span>Slider</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Layout Components</h3>
+                <ul class="component-list">
+                    <li class="component-item" draggable="true" data-type="grid">
+                        <i class="fas fa-table component-icon"></i>
+                        <span>Data Grid</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="card">
+                        <i class="fas fa-cards component-icon"></i>
+                        <span>Card</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="form">
+                        <i class="fas fa-columns component-icon"></i>
+                        <span>Form</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="nav">
+                        <i class="fas fa-navicon component-icon"></i>
+                        <span>Navigation</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Templates</h3>
+                <ul class="component-list">
+                    <li class="component-item" draggable="true" data-type="profile">
+                        <i class="fas fa-user-cog component-icon"></i>
+                        <span>User Profile</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="catalog">
+                        <i class="fas fa-shopping-cart component-icon"></i>
+                        <span>Product Catalog</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="dashboard">
+                        <i class="fas fa-chart-line component-icon"></i>
+                        <span>Dashboard</span>
+                    </li>
+                    <li class="component-item" draggable="true" data-type="login">
+                        <i class="fas fa-sign-in component-icon"></i>
+                        <span>Login Form</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="header">
+                <div class="project-name">
+                    <i class="fas fa-code-branch"></i>
+                    <span>My Application Project</span>
+                </div>
+                <div class="header-actions">
+                    <button class="btn btn-secondary" id="save-btn">
+                        <i class="fas fa-save"></i>
+                        Save
+                    </button>
+                    <button class="btn btn-primary" id="generate-btn">
+                        <i class="fas fa-play"></i>
+                        Generate Code
+                    </button>
+                </div>
+            </div>
+            
+            <div class="designer-container">
+                <div class="canvas-container">
+                    <h3 class="canvas-title">Design Canvas - Drag components here</h3>
+                    <div class="design-canvas" id="design-canvas">
+                        <!-- Example form that's already on the canvas -->
+                        <div class="form-container">
+                            <h2 class="form-title">User Registration Form</h2>
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" placeholder="Enter your name">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" class="form-input" placeholder="Enter your email">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-input" placeholder="Create a password">
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn btn-primary">Register</button>
+                                <button class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="ai-panel">
+                    <div class="ai-header">
+                        <i class="fas fa-robot ai-icon"></i>
+                        <h3 class="ai-title">AI Assistant</h3>
+                    </div>
+                    <div class="ai-conversation" id="conversation">
+                        <div class="message ai-message">
+                            Hi! I'm your AI assistant. How can I help you build your application today?
+                        </div>
+                        <div class="message user-message">
+                            Can you help me create a login form?
+                        </div>
+                        <div class="message ai-message">
+                            Sure! I can generate a login form for you. Would you like me to add it to your canvas?
+                        </div>
+                        <div class="message user-message">
+                            Yes, please. Make it with email and password fields.
+                        </div>
+                        <div class="message ai-message">
+                            Done! I've added a responsive login form to your canvas. You can customize it further by dragging additional components.
+                        </div>
+                    </div>
+                    <div class="ai-input">
+                        <input type="text" id="ai-input" placeholder="Ask the AI assistant for help...">
+                        <button id="send-message"><i class="fas fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Code Preview Modal -->
+    <div class="modal" id="code-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Generated Application Code</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="code-block">
+                <pre id="generated-code">
+// React component generated by CopilotKitGUI
+import React, { useState } from 'react';
+
+const UserRegistrationForm = () => {
+    const [formData, setFormData] = useState({
+        name: '',
+        email: '',
+        password: ''
+    });
+
+    const handleChange = (e) => {
+        setFormData({
+            ...formData,
+            [e.target.name]: e.target.value
+        });
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        // Handle form submission
+        console.log('Form submitted:', formData);
+    };
+
+    return (
+        &lt;div className="form-container"&gt;
+            &lt;h2 className="form-title"&gt;User Registration Form&lt;/h2&gt;
+            &lt;form onSubmit={handleSubmit}&gt;
+                &lt;div className="form-group"&gt;
+                    &lt;label className="form-label"&gt;Full Name&lt;/label&gt;
+                    &lt;input
+                        type="text"
+                        className="form-input"
+                        placeholder="Enter your name"
+                        name="name"
+                        value={formData.name}
+                        onChange={handleChange}
+                    /&gt;
+                &lt;/div&gt;
+                &lt;div className="form-group"&gt;
+                    &lt;label className="form-label"&gt;Email Address&lt;/label&gt;
+                    &lt;input
+                        type="email"
+                        className="form-input"
+                        placeholder="Enter your email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleChange}
+                    /&gt;
+                &lt;/div&gt;
+                &lt;div className="form-group"&gt;
+                    &lt;label className="form-label"&gt;Password&lt;/label&gt;
+                    &lt;input
+                        type="password"
+                        className="form-input"
+                        placeholder="Create a password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                    /&gt;
+                &lt;/div&gt;
+                &lt;div className="btn-group"&gt;
+                    &lt;button type="submit" className="btn btn-primary"&gt;Register&lt;/button&gt;
+                    &lt;button type="button" className="btn btn-secondary"&gt;Cancel&lt;/button&gt;
+                &lt;/div&gt;
+            &lt;/form&gt;
+        &lt;/div&gt;
+    );
+};
+
+export default UserRegistrationForm;
+                </pre>
+            </div>
+            <div class="export-options">
+                <button class="btn btn-primary">
+                    <i class="fas fa-download"></i>
+                    Download React Component
+                </button>
+                <button class="btn btn-secondary">
+                    <i class="fas fa-copy"></i>
+                    Copy to Clipboard
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced drag and drop functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const components = document.querySelectorAll('.component-item');
+            const canvas = document.getElementById('design-canvas');
+            const generateBtn = document.getElementById('generate-btn');
+            const codeModal = document.getElementById('code-modal');
+            const closeModal = document.querySelector('.close-modal');
+            const aiInput = document.getElementById('ai-input');
+            const sendMessageBtn = document.getElementById('send-message');
+            const conversation = document.getElementById('conversation');
+            
+            // Initialize components counter
+            let componentCount = 0;
+            
+            components.forEach(component => {
+                component.addEventListener('dragstart', function(e) {
+                    e.dataTransfer.setData('text/plain', component.getAttribute('data-type'));
+                    setTimeout(() => {
+                        component.classList.add('pulse');
+                    }, 0);
+                });
+                
+                component.addEventListener('dragend', function() {
+                    component.classList.remove('pulse');
+                });
+            });
+            
+            canvas.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                canvas.style.borderColor = 'var(--primary)';
+            });
+            
+            canvas.addEventListener('dragleave', function() {
+                canvas.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+            });
+            
+            canvas.addEventListener('drop', function(e) {
+                e.preventDefault();
+                canvas.style.borderColor = 'rgba(255, 255, 255, 0.1)';
+                
+                const componentType = e.dataTransfer.getData('text/plain');
+                addComponentToCanvas(componentType);
+            });
+            
+            function addComponentToCanvas(type) {
+                componentCount++;
+                const newComponent = document.createElement('div');
+                newComponent.className = 'canvas-component';
+                newComponent.setAttribute('data-id', `component-${componentCount}`);
+                newComponent.setAttribute('data-type', type);
+                
+                // Add different components based on type
+                switch(type) {
+                    case 'input':
+                        newComponent.innerHTML = `
+                            <div class="form-group">
+                                <label class="form-label">Input Field ${componentCount}</label>
+                                <input type="text" class="form-input" placeholder="Enter text">
+                            </div>
+                        `;
+                        break;
+                    case 'button':
+                        newComponent.innerHTML = `
+                            <div class="btn-group">
+                                <button class="btn btn-primary">Button ${componentCount}</button>
+                            </div>
+                        `;
+                        break;
+                    case 'card':
+                        newComponent.innerHTML = `
+                            <div style="background: rgba(99, 102, 241, 0.2); padding: 20px; border-radius: 8px;">
+                                <h3>Card Title ${componentCount}</h3>
+                                <p>This is a sample card component.</p>
+                            </div>
+                        `;
+                        break;
+                    default:
+                        newComponent.innerHTML = `
+                            <div style="padding: 15px; background: rgba(16, 185, 129, 0.2); border-radius: 8px; border-left: 4px solid var(--secondary);">
+                                <i class="fas fa-check-circle"></i> Added: ${type}
+                            </div>
+                        `;
+                }
+                
+                newComponent.style.margin = '15px 0';
+                canvas.appendChild(newComponent);
+                
+                // Add to AI conversation
+                addAIMessage(`I've added a ${type} to your canvas. You can customize it as needed.`);
+            }
+            
+            // AI input functionality
+            sendMessageBtn.addEventListener('click', handleAIMessage);
+            
+            aiInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    handleAIMessage();
+                }
+            });
+            
+            function handleAIMessage() {
+                if (aiInput.value.trim() !== '') {
+                    // Add user message
+                    addUserMessage(aiInput.value);
+                    
+                    // Simulate AI response
+                    setTimeout(() => {
+                        if (aiInput.value.toLowerCase().includes('form')) {
+                            addAIMessage("I can help with form creation. I've added a basic form template to your canvas.");
+                            addComponentToCanvas('form');
+                        } else if (aiInput.value.toLowerCase().includes('button')) {
+                            addAIMessage("I've added a button to your canvas. You can customize its style and behavior.");
+                            addComponentToCanvas('button');
+                        } else if (aiInput.value.toLowerCase().includes('table') || aiInput.value.toLowerCase().includes('grid')) {
+                            addAIMessage("Tables are great for data display. I've added a data grid to your canvas.");
+                            addComponentToCanvas('grid');
+                        } else if (aiInput.value.toLowerCase().includes('card')) {
+                            addAIMessage("Cards are perfect for displaying content. I've added one to your canvas.");
+                            addComponentToCanvas('card');
+                        } else {
+                            addAIMessage("I've made some adjustments to your application based on your request.");
+                        }
+                    }, 1000);
+                    
+                    aiInput.value = '';
+                }
+            }
+            
+            function addUserMessage(message) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'message user-message';
+                messageEl.textContent = message;
+                conversation.appendChild(messageEl);
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+            
+            function addAIMessage(message) {
+                const messageEl = document.createElement('div');
+                messageEl.className = 'message ai-message';
+                messageEl.textContent = message;
+                conversation.appendChild(messageEl);
+                conversation.scrollTop = conversation.scrollHeight;
+            }
+            
+            // Code generation modal
+            generateBtn.addEventListener('click', function() {
+                codeModal.style.display = 'flex';
+            });
+            
+            closeModal.addEventListener('click', function() {
+                codeModal.style.display = 'none';
+            });
+            
+            window.addEventListener('click', function(e) {
+                if (e.target === codeModal) {
+                    codeModal.style.display = 'none';
+                }
+            });
+            
+            // Save functionality
+            document.getElementById('save-btn').addEventListener('click', function() {
+                addAIMessage("Your project has been saved successfully!");
+            });
+        });
+    </script>
+</body>
+</html>
